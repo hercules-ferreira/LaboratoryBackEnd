@@ -1,0 +1,84 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// para criar uma migration digitar no terminal ==> yarn prisma migrate dev
+
+// yarn prisma migrate dev --create-only 
+
+//  Enter a name for the new migration: › create-models-laboratory
+
+model User {
+  id         String    @id @default(uuid())
+  name       String
+  cpf        String
+  email      String
+  password   String
+  created_at DateTime? @default(now())
+  updated_at DateTime? @default(now())
+
+  @@map("users")
+}
+
+model Category {
+  id         String    @id @default(uuid())
+  name       String
+  created_at DateTime? @default(now())
+  updated_at DateTime? @default(now())
+  products   Product[]
+
+  @@map("categories")
+}
+
+model Product {
+  id                  String    @id @default(uuid())
+  name                String
+  code                String
+  price               String
+  delivery_time       String
+  description         String
+  created_at  DateTime? @default(now())
+  updated_at  DateTime? @default(now())
+
+  category    Category @relation(fields: [category_id], references: [id])
+  category_id String
+  items       Item[]
+
+  @@map("products")
+}
+
+model Order {
+  id         String  @id @default(uuid())
+  number_sus String
+  name       String  
+  status     Boolean @default(false)
+  draft      Boolean @default(true)
+
+  created_at DateTime? @default(now())
+  updated_at DateTime? @default(now())
+  items      Item[]
+
+  @@map("orders")
+}
+
+model Item {
+  id String @id @default(uuid())
+
+  created_at DateTime? @default(now())
+  updated_at DateTime? @default(now())
+
+  order      Order   @relation(fields: [order_id], references: [id])
+  product    Product @relation(fields: [product_id], references: [id])
+  order_id   String
+  product_id String
+
+  @@map("items")
+}
